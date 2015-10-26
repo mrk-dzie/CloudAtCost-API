@@ -1,0 +1,23 @@
+{
+  "name": "mrk-dzie/CloudAtCost-API",
+  "description": "PHP Cloud At Cost API client",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Marek Dzienisiuk",
+      "email": "hello@mrk.space"
+    }
+  ],
+  "require": {
+    "php": ">=5.3.3"
+  },
+  "require-dev": {
+    "phpunit/phpunit": "~4.8.0"
+  },
+  "minimum-stability": "dev",
+  "autoload": {
+    "psr-0": {
+      "mrk_dzie": "src/"
+    }
+  }
+}
