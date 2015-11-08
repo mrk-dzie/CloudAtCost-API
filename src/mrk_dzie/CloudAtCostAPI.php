@@ -17,14 +17,19 @@ class CloudAtCostAPI
      */
     protected $credentials = array();
 
+    /**
+     * @var false|int $lastHttpResponseCode
+     */
     protected $lastHttpResponseCode;
 
     /**
+     * Set the "CAC_LOGIN" and "CAC_KEY" environment variables or define
+     * credentials in the arguments of method.
      * @param string $login
      * @param string $key
-     * @throws \Exception
+     * @throws \UnexpectedValueException
      */
-    public function __construct($login, $key)
+    public function __construct($login = null, $key = null)
     {
         if (!is_string($login) || !is_string($key)) {
             if (is_string(getenv('CAC_LOGIN')) && is_string(getenv('CAC_KEY'))) {
@@ -94,67 +99,68 @@ class CloudAtCostAPI
 
     /**
      * Activate server power operations.
-     * @param $sid
+     * @param $serverId
      * @param string $action poweron|poweroff|reset
      * @return false|string
      */
-    public function serverPowerControl($sid, $action)
+    public function powerControl($serverId, $action)
     {
         if ($action != 'poweron' || $action != 'poweroff' || $action != 'reset') {
             throw new \UnexpectedValueException("Unsupported power operation!");
         }
-        $data = array('sid' => $sid, 'action' => $action);
+        $data = array('sid' => $serverId, 'action' => $action);
         return $this->httpRequest(self::API_URL . self::API_VERSION . '/powerop.php', 'POST', $data);
     }
 
     /**
      * Set the run mode of the server to either 'normal' or 'safe'. Safe automatically turns off the server after 7
      * days of idle usage. Normal keeps it on indefinitely.
-     * @param $sid
+     * @param $serverId
      * @param string $mode normal|safe
      * @return false|string
      */
-    public function serverRunMode($sid, $mode)
+    public function changeRunMode($serverId, $mode)
     {
         if ($mode != 'normal' || $mode != 'safe') {
             throw new \UnexpectedValueException("Unsupported run mode!");
         }
-        $data = array('sid' => $sid, 'mode' => $mode);
+        $data = array('sid' => $serverId, 'mode' => $mode);
         return $this->httpRequest(self::API_URL . self::API_VERSION . '/runmode.php', 'POST', $data);
     }
 
     /**
      * Rename the server label
-     * @param $sid
+     * @param $serverId
      * @param string $newName
      * @return false|string
      */
-    public function serverRename($sid, $newName)
+    public function changeName($serverId, $newName)
     {
-        $data = array('sid' => $sid, 'name' => $newName);
+        $data = array('sid' => $serverId, 'name' => $newName);
         return $this->httpRequest(self::API_URL . self::API_VERSION . '/renameserver.php', 'POST', $data);
     }
 
     /**
      * Modify the reverse DNS & hostname of the VPS
-     * @param $sid
+     * @param $serverId
      * @param string $hostname
      * @return false|string
      */
-    public function serverHostname($sid, $hostname)
+    public function changeHostname($serverId, $hostname)
     {
-        $data = array('sid' => $sid, 'hostname' => $hostname);
+        $data = array('sid' => $serverId, 'hostname' => $hostname);
         return $this->httpRequest(self::API_URL . self::API_VERSION . '/rdns.php', 'POST', $data);
     }
 
     /**
      * Request URL for console access
-     * @param $sid
+     * @param $serverId
      * @return false|string
      */
-    public function serverConsole($sid)
+    public function getConsoleUrl($serverId)
     {
-        return $this->httpRequest(self::API_URL . self::API_VERSION . '/console.php', 'POST', array('sid' => $sid));
+        return $this->httpRequest(self::API_URL . self::API_VERSION . '/console.php', 'POST',
+            array('sid' => $serverId));
     }
 
     /**
@@ -173,13 +179,13 @@ class CloudAtCostAPI
 
     /**
      * CloudPro: Delete / terminate server to add resources.
-     * @param $sid
+     * @param $serverId
      * @return false|string
      */
-    public function serverDelete($sid)
+    public function serverDelete($serverId)
     {
         return $this->httpRequest(self::API_URL . self::API_VERSION . '/cloudpro/delete.php', 'POST',
-            array('sid' => $sid));
+            array('sid' => $serverId));
     }
 
     /**
@@ -199,25 +205,21 @@ class CloudAtCostAPI
      * @return string|false
      * @throws \HttpRequestMethodException
      */
-    protected
-    function httpRequest(
-        $url,
-        $method = 'GET',
-        array $data = null
-    ) {
+    protected function httpRequest($url, $method = 'GET', array $data = null)
+    {
+        $data = (is_array($data)) ? array_merge($data, $this->credentials) : $this->credentials;
         if (strcasecmp($method, 'GET') == 0) {
             $opts = array(
-                'ssl' => array(
+                'http' => array(
                     'method' => 'GET',
                     'verify_peer' => false,
                     'verify_peer_name' => false
                 )
             );
-            $data = (is_array($data)) ? array_merge($data, $this->credentials) : $this->credentials;
             $url .= '?' . http_build_query($data);
         } elseif (strcasecmp($method, 'POST') == 0) {
             $opts = array(
-                'ssl' => array(
+                'http' => array(
                     'method' => 'POST',
                     'header' => 'Content-type: application/x-www-form-urlencoded',
                     'content' => http_build_query($data),
@@ -241,11 +243,11 @@ class CloudAtCostAPI
     /**
      * Extract HTTP response code and save it as last occurred
      * @param $http_response_header
+     * @throws \UnexpectedValueException
      */
-    protected
-    function extractHttpCode(
-        $http_response_header
-    ) {
+    protected function extractHttpCode($http_response_header)
+    {
+        $this->lastHttpResponseCode = false;
         foreach ($http_response_header as $value) {
             if (preg_match("#HTTP/[0-9\.]+\s+([0-9]+)#", $value, $o)) {
                 $this->lastHttpResponseCode = intval($o[1]);
@@ -275,5 +277,4 @@ class CloudAtCostAPI
                 break;
         }
     }
-
 }
