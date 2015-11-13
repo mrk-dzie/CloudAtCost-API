@@ -105,11 +105,11 @@ class CloudAtCostAPI
      */
     public function powerControl($serverId, $action)
     {
-        if ($action != 'poweron' || $action != 'poweroff' || $action != 'reset') {
-            throw new \UnexpectedValueException("Unsupported power operation!");
+        if ($action == 'poweron' || $action == 'poweroff' || $action == 'reset') {
+            $data = array('sid' => $serverId, 'action' => $action);
+            return $this->httpRequest(self::API_URL . self::API_VERSION . '/powerop.php', 'POST', $data);
         }
-        $data = array('sid' => $serverId, 'action' => $action);
-        return $this->httpRequest(self::API_URL . self::API_VERSION . '/powerop.php', 'POST', $data);
+        throw new \UnexpectedValueException("Unsupported power operation!");
     }
 
     /**
@@ -121,11 +121,11 @@ class CloudAtCostAPI
      */
     public function changeRunMode($serverId, $mode)
     {
-        if ($mode != 'normal' || $mode != 'safe') {
-            throw new \UnexpectedValueException("Unsupported run mode!");
+        if ($mode == 'normal' || $mode == 'safe') {
+            $data = array('sid' => $serverId, 'mode' => $mode);
+            return $this->httpRequest(self::API_URL . self::API_VERSION . '/runmode.php', 'POST', $data);
         }
-        $data = array('sid' => $serverId, 'mode' => $mode);
-        return $this->httpRequest(self::API_URL . self::API_VERSION . '/runmode.php', 'POST', $data);
+        throw new \UnexpectedValueException("Unsupported run mode!");
     }
 
     /**
