@@ -134,7 +134,7 @@ class CloudAtCostAPI
      * @param string $newName
      * @return false|string
      */
-    public function changeName($serverId, $newName)
+    public function renameServer($serverId, $newName)
     {
         $data = array('sid' => $serverId, 'name' => $newName);
         return $this->httpRequest(self::API_URL . self::API_VERSION . '/renameserver.php', 'POST', $data);
@@ -171,7 +171,7 @@ class CloudAtCostAPI
      * @param $templateID
      * @return false|string
      */
-    public function serverBuild($cpu, $ram, $storage, $templateID)
+    public function buildServer($cpu, $ram, $storage, $templateID)
     {
         $data = array('cpu' => $cpu, 'ram' => $ram, 'storage' => $storage, 'os' => $templateID);
         return $this->httpRequest(self::API_URL . self::API_VERSION . '/cloudpro/build.php', 'POST', $data);
@@ -182,7 +182,7 @@ class CloudAtCostAPI
      * @param $serverId
      * @return false|string
      */
-    public function serverDelete($serverId)
+    public function deleteServer($serverId)
     {
         return $this->httpRequest(self::API_URL . self::API_VERSION . '/cloudpro/delete.php', 'POST',
             array('sid' => $serverId));
