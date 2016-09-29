@@ -210,7 +210,7 @@ class CloudAtCostAPI
         $data = (is_array($data)) ? array_merge($data, $this->credentials) : $this->credentials;
         if (strcasecmp($method, 'GET') == 0) {
             $opts = array(
-                'http' => array(
+                'ssl' => array(
                     'method' => 'GET',
                     'verify_peer' => false,
                     'verify_peer_name' => false
@@ -219,7 +219,7 @@ class CloudAtCostAPI
             $url .= '?' . http_build_query($data);
         } elseif (strcasecmp($method, 'POST') == 0) {
             $opts = array(
-                'http' => array(
+                'ssl' => array(
                     'method' => 'POST',
                     'header' => 'Content-type: application/x-www-form-urlencoded',
                     'content' => http_build_query($data),
@@ -232,7 +232,7 @@ class CloudAtCostAPI
         }
 
         $ret = @file_get_contents($url, false, stream_context_create($opts));
-        if (is_array($http_response_header)) {
+        if (isset($http_response_header) && is_array($http_response_header)) {
             $this->extractHttpCode($http_response_header);
         } else {
             throw new \UnexpectedValueException("Cannot receive a response.");
