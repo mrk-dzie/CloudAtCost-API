@@ -7,12 +7,12 @@ class CloudAtCostAPI
     /**
      * The base URL of CloudAtCost API
      */
-    const API_URL = 'https://panel.cloudatcost.com/api/';
+    const API_URL = 'https://panel.cloudatcost.com';
 
     /**
      * Currently used version of CloudAtCost API
      */
-    const API_VERSION = 'v1';
+    const API_VERSION = '/api/v1';
 
     /**
      * The credentials data used to access CloudAtCost API
@@ -45,7 +45,7 @@ class CloudAtCostAPI
         }
         $this->credentials['login'] = $login;
         $this->credentials['key'] = $key;
-        $this->client = new Client(['base_uri' => self::API_URL . self::API_VERSION, 'verify' => false]);
+        $this->client = new Client(['base_uri' => self::API_URL, 'verify' => false]);
     }
 
     /**
@@ -81,7 +81,7 @@ class CloudAtCostAPI
      */
     public function getListServers()
     {
-        return $this->httpRequest('/listservers.php');
+        return $this->httpRequest(self::API_VERSION . '/listservers.php');
     }
 
     /**
@@ -90,7 +90,7 @@ class CloudAtCostAPI
      */
     public function getListTemplates()
     {
-        return $this->httpRequest('/listtemplates.php');
+        return $this->httpRequest(self::API_VERSION . '/listtemplates.php');
     }
 
     /**
@@ -99,7 +99,7 @@ class CloudAtCostAPI
      */
     public function getListTasks()
     {
-        return $this->httpRequest('/listtasks.php');
+        return $this->httpRequest(self::API_VERSION . '/listtasks.php');
     }
 
     /**
@@ -112,7 +112,7 @@ class CloudAtCostAPI
     {
         if ($action == 'poweron' || $action == 'poweroff' || $action == 'reset') {
             $data = array('sid' => $serverId, 'action' => $action);
-            return $this->httpRequest('/powerop.php', 'POST', $data);
+            return $this->httpRequest(self::API_VERSION . '/powerop.php', 'POST', $data);
         }
         throw new \UnexpectedValueException("Unsupported power operation!");
     }
@@ -128,7 +128,7 @@ class CloudAtCostAPI
     {
         if ($mode == 'normal' || $mode == 'safe') {
             $data = array('sid' => $serverId, 'mode' => $mode);
-            return $this->httpRequest('/runmode.php', 'POST', $data);
+            return $this->httpRequest(self::API_VERSION . '/runmode.php', 'POST', $data);
         }
         throw new \UnexpectedValueException("Unsupported run mode!");
     }
@@ -142,7 +142,7 @@ class CloudAtCostAPI
     public function renameServer($serverId, $newName)
     {
         $data = array('sid' => $serverId, 'name' => $newName);
-        return $this->httpRequest('/renameserver.php', 'POST', $data);
+        return $this->httpRequest(self::API_VERSION . '/renameserver.php', 'POST', $data);
     }
 
     /**
@@ -154,7 +154,7 @@ class CloudAtCostAPI
     public function changeHostname($serverId, $hostname)
     {
         $data = array('sid' => $serverId, 'hostname' => $hostname);
-        return $this->httpRequest('/rdns.php', 'POST', $data);
+        return $this->httpRequest(self::API_VERSION . '/rdns.php', 'POST', $data);
     }
 
     /**
@@ -164,7 +164,7 @@ class CloudAtCostAPI
      */
     public function getConsoleUrl($serverId)
     {
-        return $this->httpRequest('/console.php', 'POST',
+        return $this->httpRequest(self::API_VERSION . '/console.php', 'POST',
             array('sid' => $serverId));
     }
 
@@ -179,7 +179,7 @@ class CloudAtCostAPI
     public function buildServer($cpu, $ram, $storage, $templateID)
     {
         $data = array('cpu' => $cpu, 'ram' => $ram, 'storage' => $storage, 'os' => $templateID);
-        return $this->httpRequest('/cloudpro/build.php', 'POST', $data);
+        return $this->httpRequest(self::API_VERSION . '/cloudpro/build.php', 'POST', $data);
     }
 
     /**
@@ -189,7 +189,7 @@ class CloudAtCostAPI
      */
     public function deleteServer($serverId)
     {
-        return $this->httpRequest('/cloudpro/delete.php', 'POST',
+        return $this->httpRequest(self::API_VERSION . '/cloudpro/delete.php', 'POST',
             array('sid' => $serverId));
     }
 
@@ -199,7 +199,7 @@ class CloudAtCostAPI
      */
     public function getResourcesInfo()
     {
-        return $this->httpRequest('/cloudpro/resources.php');
+        return $this->httpRequest(self::API_VERSION . '/cloudpro/resources.php');
     }
 
     /**
