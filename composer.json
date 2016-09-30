@@ -1,5 +1,6 @@
 {
   "name": "mrk-dzie/cloudatcost-api",
+  "type": "library",
   "description": "PHP Cloud At Cost API client",
   "license": "MIT",
   "authors": [
@@ -9,12 +10,12 @@
     }
   ],
   "require": {
-    "php": ">=5.3.3"
+    "php": ">=5.3.3",
+    "guzzlehttp/guzzle": "^6.2"
   },
   "require-dev": {
     "phpunit/phpunit": "~4.8.0"
   },
-  "minimum-stability": "dev",
   "autoload": {
     "psr-0": {
       "mrk_dzie": "src/"
